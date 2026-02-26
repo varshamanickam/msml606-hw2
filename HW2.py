@@ -1,4 +1,12 @@
 import csv
+
+### REFERENCES USED:
+#1) https://cse.iitkgp.ac.in/~debdeep/teaching/FOCS/slides/TreesnRelations.pdf
+#2) https://youtu.be/WHs-wSo33MM?si=kqIleThDT-w4K2qA
+#3) Clarified stack tree relationship using chatgpt. Asked it to walk me through examples and give me
+# example problems to see if I understood postfix correctly
+
+
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -24,7 +32,55 @@ class HomeWork2:
     #     3   4
 
     def constructBinaryTree(self, input) -> TreeNode:
-        pass
+        operations = {"+", "-", "*", "/"} 
+        #just including the basic ops mentioned in the hw instructoins
+        #used a set above because only unique elements and easy condition to check presence. eg: if token is in operations: do logic
+        # and if token not in operations, then that would mean that that token is a number assuming only numbers and these listed ops will be in the input
+        
+        stack = []
+
+        #logic for the for loop: goes throug the tokens in the input and if it's a number (operand), push as leaf nodes
+        # if not a number (so if operator), then pop twice, push the operator with the 2 subtrees popped earlier as its children
+        # finally, return the final root
+
+        #handling empty input edge case
+        if not input:
+            return None # since empty input produces empty tree
+        
+        for token in input:
+            token = token.strip() #i don't see any whitespaces in the test cases but just in case edge case handling
+
+            #like I mentioned earlier, if token not in operatinos, then that token is a number and should be pushed as a leaf node
+            if token not in operations:
+                node = TreeNode(token)
+                stack.append(node)
+            
+            # if it is a token, need to pop twice, right subtree first and then left subtree and then push the operator node and then 
+            # the popped nodes as its children
+            # Also, the first one popped is right and second one popped is left subtree because postfix format is (left operand   right operand   operator)
+            else:
+                #need to pop twice (2 subtrees) when we come across an operator in the input so if there aren't 2 subtrees to pop, then that's not enough 
+                #operands before an operator. Not satisfying: (total_num of operands = total_num_of_operators + 1)
+                if len(stack) < 2:
+                    raise ValueError("Not enough operands before operator")
+                right_subtree = stack.pop() #first pop - right
+                left_subtree = stack.pop() #second pop - left subtree
+
+                # pushing the operator as operator node and then popped nodes as its left and right children nodes
+                node = TreeNode(token, left_subtree, right_subtree) 
+                stack.append(node)
+        
+        # Used chatgpt here to understand how the final stack should only have one element. Took a bit to click that we're not adding the nodes themselves
+        # but subtrees to the stack so if there's more than one subtree, then that means that there are multiple complete expressoins that were never combined 
+        # into one expression 
+        # This case will happen when (total # of operands) != (total # of operators + 1)
+        if len(stack) != 1:
+            raise ValueError("More than 1 complete expression present. There should only be one final complete expression.")
+        
+        return stack[0] #we want the first element (there should only be one element going by the logic I mentioned just above)
+    
+        
+
 
 
 
