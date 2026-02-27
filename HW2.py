@@ -1,12 +1,13 @@
 import csv
 
+
+########################
 ### REFERENCES USED:
 #1) https://cse.iitkgp.ac.in/~debdeep/teaching/FOCS/slides/TreesnRelations.pdf
 #2) https://youtu.be/WHs-wSo33MM?si=kqIleThDT-w4K2qA
-#3) Clarified stack tree relationship using chatgpt. Asked it to walk me through examples and give me
-# example problems to see if I understood postfix correctly
-
-
+#3) Conceptually clarified stack tree relationship using chatgpt. Asked it to walk me through examples and give me
+# example problems to see if I understood postfix correctly. But otherwise all code and comments are my own
+########################
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -149,8 +150,30 @@ class Stack:
     # Use your own stack implementation to solve problem 3
 
     def __init__(self):
-        # TODO: initialize the stack
-        pass
+        #using Python list as theunderlying storage
+        self.stack = []
+        self.top = -1 #because stack is empty when we initialize and so there is no top element
+
+    def isEmpty(self) -> bool:
+        return self.top == -1 # stack is empty if there's no element in which case we'd set index of the top element to -1 above
+
+    def push(self, x) -> None:
+        # just push x to the top of the stack
+        self.stack.append(x)
+        self.top += 1 #increment index of the top element since we just pushed something new
+
+    def pop(self):
+        if self.isEmpty():
+            raise IndexError("Attempt to pop from an empty stack")
+        top_value = self.stack[self.top]
+
+        #remove the last (top) element and decrement top so it points to the updated topmost element
+        self.stack.pop()
+        self.top -= 1
+        return top_value
+
+    def size(self) -> int:
+        return self.top + 1
 
     # Problem 3: Write code to evaluate a postfix expression using stack and return the integer value
     # Use stack which you implemented above for this problem
@@ -165,9 +188,50 @@ class Stack:
 
     # DO NOT USE EVAL function for evaluating the expression
 
-    def evaluatePostfix(exp: str) -> int:
-        # TODO: implement this using your Stack class
-        pass
+    def evaluatePostfix(self, exp: str) -> int:
+        if exp is None or exp.strip() == "": ## Need to check for both empty string and when exp is None
+            raise ValueError("Input is empty postfix expression")
+        
+        tokens = exp.split() # to split the tokens into indvidual elements in a list rather than one long string
+        operations = {"+", "-", "*", "/"} 
+
+        #basically same logic and explanation I gave for problem 1
+        for token in tokens:
+            if token in operations:
+                if self.size() < 2:
+                    raise ValueError("Not enough operands before operator") # need to pop twice if we encounter an operator. if size < 2, then not enough operands so raise error
+                right = self.pop()
+                left = self.pop() # already clarified in P1 why right is the first pop and left is the second pop (postfix order)
+
+                if token == "+":
+                    result = left + right
+                elif token == "-":
+                    result = left - right
+                elif token == "*":
+                    result = left * right
+                else: #for the "/" division operator
+                    if right == 0: #to protect against division by zero
+                        raise ZeroDivisionError("Division by zero")
+                    result = int(left / right)
+
+                self.push(result) # finally push the result to the stack
+
+            #trying to cast whatever non operator we come across in the input as int
+            # if unable to cast as int ,then it's not a valid input anyways so we raise an error. 
+            # This could be a non number or a non valid operator () meaning not in the operations set we defined
+            else:
+                try:
+                    item = int(token)
+                except ValueError:
+                    raise ValueError(f"This token in invalid: {token}")
+                self.push(item) # if it is a number, we push it no problem
+
+        if self.size() != 1:
+            raise ValueError("More than 1 final expression") # same reasoning I provided for P1. There has to be only 1 complete and final expression at the end
+        
+        return self.pop() # whatever the final result computation is, pop and return that number
+
+
 
 
 # Main Function. Do not edit the code below
