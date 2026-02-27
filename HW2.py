@@ -219,6 +219,12 @@ class Stack:
             #trying to cast whatever non operator we come across in the input as int
             # if unable to cast as int ,then it's not a valid input anyways so we raise an error. 
             # This could be a non number or a non valid operator () meaning not in the operations set we defined
+            # This else conditional also takes care of negative numbers in the expression. eg: since at the beginning, we split by space and not by character
+            # -3 is not split as "-" and "3" but rather as "-3" and when we do int(-3), it's correctly converted to -3 so negative numbers end up being treated exactly like positive numbers
+            # Only time this would break is if input had a space in between and looked like "- 3" in which case, it would be treated as "-" and "3" and not "-3"
+
+            # Large numbers too will get pushed fine with no problem. Only thing is extremely extremely huge numbers with maybe millions or thousands of digits will be slower and take a lot of RAM
+            # but otherwise they're also accommodated for
             else:
                 try:
                     item = int(token)
