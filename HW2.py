@@ -90,7 +90,14 @@ class HomeWork2:
     # you can see the examples in p2_traversals.csv
 
     def prefixNotationPrint(self, head: TreeNode) -> list:
-        pass
+        #for empty subtree and for when we have to call this func on head.left or head.right and they are None
+        if head is None:
+            return [] 
+        #prefix order is (root, left, right)
+        left = self.prefixNotationPrint(head.left)
+        right = self.prefixNotationPrint(head.right)
+
+        return [str(head.val)] + left + right
 
     # Problem 2.2: Use in-order traversal (left, root, right) for infix notation with appropriate parentheses.
     # return an array of elements of an infix expression
@@ -102,7 +109,18 @@ class HomeWork2:
     # treat parentheses as individual elements in the returned list (see output)
 
     def infixNotationPrint(self, head: TreeNode) -> list:
-        pass
+        #for empty subtree and for when we have to call this func on head.left or head.right and they are None
+        if head is None:
+            return [] 
+        # don't want to add parantheses around leaves
+        if head.left is None and head.right is None:
+            return [str(head.val)]
+        
+        #infix order is (left, root, right)
+        left = self.infixNotationPrint(head.left)
+        right = self.infixNotationPrint(head.right)
+
+        return ["("] + left + [str(head.val)] + right + [")"]
 
 
     # Problem 2.3: Use post-order traversal (left, right, root) to generate postfix notation.
@@ -111,7 +129,14 @@ class HomeWork2:
     # you can see the examples in p2_traversals.csv
 
     def postfixNotationPrint(self, head: TreeNode) -> list:
-        pass
+        #for empty subtree and for when we have to call this func on head.left or head.right and they are None
+        if head is None:
+            return [] 
+        #postfix order is (left, right, root)
+        left = self.postfixNotationPrint(head.left)
+        right = self.postfixNotationPrint(head.right)
+
+        return left + right + [str(head.val)]
 
 
 class Stack:
